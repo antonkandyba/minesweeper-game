@@ -1,103 +1,98 @@
-h1 {
-	text-align: center;
+body {
+	font-family: Arial;
+	background-color: snow;
 }
 
+.header {
+	text-align: center;
+	padding: 35px;
+	margin-bottom: 20px;
+
+	background: #808080;
+	color: ghostwhite;
+	font-size: 35px;
+	font-weight: 600;
+}
+
+.page-flexbox {
+	display: flex;
+	justify-content: center;
+	gap: 40px;
+}
+
+.game-buttons {
+	display: flex;
+	flex-direction: column;
+}
+
+.game-buttons button {
+	width: 140px;
+	padding: 10px;
+
+	cursor: pointer;
+
+	font-size: 1.1em;
+	font-weight: bold;
+
+	background-color: #808080;
+	color: ghostwhite;
+	border: 2px solid #c6c6c6;
+	border-radius: 4px;
+}
+
+.game-buttons button:hover {
+	background-color: hsla(0, 0%, 20%, 0.7);
+}
+
+#undo-button {
+	background-color: slateblue;
+}
+
+#hidden-button {
+	visibility: hidden;
+	height: 80px;
+}
 .difficulty-buttons {
 	margin-bottom: 20px;
 	text-align: center;
 }
 
-table {
-	border: 1px solid #c6c6c6;
-	margin: auto;
-}
-
-td {
-	height: 45px;
-	width: 45px;
-
-	text-align: center;
-	font-weight: 1000;
-	font-size: 25px;
-
-	background-color: #c6c6c6;
-
-	border-color: #808080;
-
-	cursor: default;
-	user-select: none;
-}
-
-.hidden {
-	font-size: 0;
-	background-color: #808080;
-}
-
-.blown {
-	background-color: brown;
-}
-
-.flex-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.flex-header div {
+.difficulty-buttons button {
+	width: 150px;
 	padding: 10px;
-	margin: 5px;
+	margin: 0 10px;
+
+	font-size: 1.1em;
+	font-weight: bold;
+
 	background-color: #808080;
+	color: ghostwhite;
+	border: 2px solid #c6c6c6;
+	border-radius: 4px;
 }
 
-.board-header button {
-	height: 50px;
-	width: 50px;
-	margin: 5px;
+.difficulty-buttons button:hover {
+	background-color: hsla(0, 0%, 20%, 0.7);
+}
 
-	font-size: 25px;
+.high-scores {
+	padding: 10px;
 
-	border: 2px solid #808080;
-	background-color: #c6c6c6;
+	border: 2px solid #c6c6c6;
+	background-color: #808080;
+	color: ghostwhite;
+}
+
+.hints-count:hover {
+	text-shadow: 0 0 3px #fff, 0 0 5px #fff, 0 0 7px #fff, 0 0 10px #a2c00e, 0 0 15px #f5f507,
+		0 0 20px #f3ef09;
 }
 
 footer {
+	display: block;
 	position: absolute;
 	bottom: 0;
 
 	padding: 10px;
 	height: 30px;
-
-	text-align: right;
-}
-
-.number1 {
-	color: blue;
-}
-
-.number2 {
-	color: green;
-}
-
-.number3 {
-	color: red;
-}
-
-.number4 {
-	color: darkblue;
-}
-
-.number5 {
-	color: brown;
-}
-
-.number6 {
-	color: darkcyan;
-}
-
-.number7 {
-	color: black;
-}
-
-.number8 {
-	color: gray;
 }

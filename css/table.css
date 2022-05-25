@@ -1,0 +1,104 @@
+table {
+	border: 1px solid #808080;
+	margin: auto;
+}
+
+td {
+	height: 45px;
+	width: 45px;
+
+	text-align: center;
+	font-weight: 1000;
+	font-size: 25px;
+
+	background-color: #c6c6c6;
+
+	border-color: #808080;
+
+	cursor: default;
+	user-select: none;
+	box-shadow: inset 0.1em 0.1em 0.3em 0 #c6c6c6, inset -0.1em -0.1em 0 0 #808080;
+	transition: box-shadow 10s;
+}
+
+.hidden {
+	font-size: 0;
+	background-color: #808080;
+	box-shadow: inset 1px 1px 0px 1px black;
+}
+
+.hidden:hover {
+	background-color: hsla(0, 0%, 20%, 0.7);
+}
+
+.blown {
+	background-color: brown;
+}
+
+.flex-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-shrink: 0;
+
+	color: ghostwhite;
+}
+
+.flex-header div {
+	padding: 3px;
+	margin: 4px;
+	background-color: #808080;
+
+	box-shadow: 1px 1px 0px 1px;
+}
+
+.board-header button {
+	height: 45px;
+	width: 45px;
+	margin: 8px;
+	padding: 4px;
+
+	font-size: 25px;
+	text-align: center;
+
+	border: 2px solid #808080;
+	background-color: #c6c6c6;
+	box-shadow: 1px 1px 1px 1px;
+}
+
+.board-header button:active {
+	box-shadow: 0 0 0 0;
+}
+
+.footer-flex {
+	display: flex;
+	justify-content: space-between;
+
+	font-size: 20px;
+	padding: 5px;
+}
+
+.number1 {
+	color: blue;
+}
+.number2 {
+	color: green;
+}
+.number3 {
+	color: red;
+}
+.number4 {
+	color: darkblue;
+}
+.number5 {
+	color: brown;
+}
+.number6 {
+	color: darkcyan;
+}
+.number7 {
+	color: black;
+}
+.number8 {
+	color: gray;
+}

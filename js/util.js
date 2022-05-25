@@ -2,7 +2,7 @@
 
 const STANDARD_SMILEY = '🙂';
 const WIN_SMILEY = '😎';
-const LOSE_SMILEY = '🤯';
+const LOSE_SMILEY = '😖';
 const LIFE = '💗';
 const HINT = '💡';
 
@@ -45,6 +45,9 @@ function renderBoard(board) {
 	var elBoard = document.querySelector('.board');
 	elBoard.innerHTML = boardHTML;
 
+	renderLives();
+	renderHints();
+
 	preventTdContextMenu();
 }
 
@@ -53,10 +56,31 @@ function getBoardFooter() {
                 <td colspan="${gBoard[0].length}">
                     <div class ="footer-flex">
                         <div class="lives-count"></div>
-                        <div class="hints-count"></div>
+                        <div class="hints-count" onclick="clickHint(this)"></div>
                     </div>
                 </td>
             </tr>`;
+}
+
+function renderLives() {
+	var elLives = document.querySelector('.lives-count');
+
+	var lives = LIFE.repeat(gGame.livesCount);
+
+	elLives.innerText = lives;
+}
+
+function renderHints() {
+	var elHints = document.querySelector('.hints-count');
+	var hints = HINT.repeat(gGame.hintsCount);
+
+	if (gHints.isHintsClicked) {
+		elHints.style.textShadow =
+			'0 0 3px #fff, 0 0 5px #fff, 0 0 7px #fff,' +
+			'0 0 10px #a2c00e, 0 0 15px #f5f507,0 0 20px #f3ef09';
+	}
+
+	elHints.innerText = hints;
 }
 
 function renderSmiley(smiley) {
@@ -104,6 +128,24 @@ function buildEmptyBoard(size) {
 		}
 	}
 	return board;
+}
+
+function renderHighScores() {
+	var beginnerScore = localStorage.getItem('beginnerScore');
+	var mediumScore = localStorage.getItem('mediumScore');
+	var expertScore = localStorage.getItem('expertScore');
+
+	if (!beginnerScore) beginnerScore = 0;
+	if (!mediumScore) mediumScore = 0;
+	if (!expertScore) expertScore = 0;
+
+	var elBeginner = document.querySelector('#beginner-score');
+	var elMedium = document.querySelector('#medium-score');
+	var elExpert = document.querySelector('#expert-score');
+
+	elBeginner.innerText = beginnerScore;
+	elMedium.innerText = mediumScore;
+	elExpert.innerText = expertScore;
 }
 
 // gets random position on the board

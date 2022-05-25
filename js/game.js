@@ -45,9 +45,14 @@ function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 	gGame.shownCount = 0;
 	gGame.markedCount = 0;
 
+	gHints.hintTimeout = 0;
+	gHints.hintOrigCells = [];
+	gHints.isHintsClicked = false;
+
 	// buildBoard(gBoard);
 	renderBoard(gBoard);
 	renderSmiley(STANDARD_SMILEY);
+	renderHighScores();
 }
 
 // builds cells for an empty board, pos is the position of the first click
@@ -88,6 +93,8 @@ function cellClicked(elCell) {
 	if (!gGame.interval) firstClick(elCell);
 	// do nothing if game is not on
 	if (!gGame.isOn) return;
+	// if hint is shown, do nothing
+	if (gHints.hintTimeout) return;
 
 	var cell = gBoard[elCell.dataset.i][elCell.dataset.j];
 	// ignore alerady shown cell
@@ -95,33 +102,53 @@ function cellClicked(elCell) {
 	// do nothing if flag is clicked
 	if (cell.isMarked) return;
 
-	// if closed cell is clicked, show it
+	// if player clicked the hint before clicking on the board
+	if (gHints.isHintsClicked) {
+		revealNeighbours(elCell);
+		gGame.hintsCount--;
+		gHints.hintTimeout = setTimeout(hideNeighbours, 1000);
+		return;
+	}
+
+	// if hidden cell is clicked, show it
 	cell.isShown = true;
 	cell.isChecked = true;
 
+	// if we hit a mine
 	if (cell.isMine) {
-		// stop game
-		cell.isBlown = true;
-		gGame.isOn = false;
-		clearInterval(gGame.interval);
+		gGame.livesCount--;
 
-		revealAllMines(gBoard);
+		// regard pressing a bomb with lives left the same as putting a flag on it
+		gGame.flagsCount++;
+		gGame.markedCount++;
 
-		// change the smiley
-		renderSmiley(LOSE_SMILEY);
+		// we still win if the last click was a bomb and we had lives
+		checkGameOver();
+
+		// stop game if we lost all lives
+		if (!gGame.livesCount) {
+			cell.isBlown = true;
+			gGame.isOn = false;
+			clearInterval(gGame.interval);
+
+			revealAllMines(gBoard);
+			renderSmiley(LOSE_SMILEY);
+		}
+	} else {
+		// if it was not a bomb
+		gGame.shownCount++;
+
+		// expand more squares if the clicked one is empty, shown count is handled inside
+		if (cell.mineAroundCount === 0) {
+			expandShown(gBoard, +elCell.dataset.i, +elCell.dataset.j);
+			renderBoard(gBoard);
+		}
+
+		// check for win condition
+		checkGameOver();
 	}
 
-	// increase shown cells count for the opened cell
-	gGame.shownCount++;
-	// expand more squares if the clicked one is empty, shown count is handled inside
-	if (cell.mineAroundCount === 0) {
-		expandShown(gBoard, +elCell.dataset.i, +elCell.dataset.j);
-		renderBoard(gBoard);
-	}
-
-	// check for win condition
-	checkGameOver();
-
+	renderFlagsCount();
 	renderBoard(gBoard);
 }
 
@@ -140,6 +167,8 @@ function firstClick(elCell) {
 function cellMarked(elCell) {
 	// do nothing if game is not on
 	if (!gGame.isOn) return;
+	// if hint is pressed or shown, do nothing
+	if (gHints.hintTimeout || gHints.isHintsClicked) return;
 
 	var cell = gBoard[elCell.dataset.i][elCell.dataset.j];
 	// do nothing if cell is already shown and it is not a flag
@@ -210,6 +239,32 @@ function checkGameOver() {
 			gGame.isOn = false;
 			clearInterval(gGame.interval);
 			renderSmiley(WIN_SMILEY);
+
+			// check if we have a new high score
+			var timeNow = new Date();
+			var seconds = Math.floor((timeNow - gGame.startTime) / 1000);
+
+			if (gLevel.size === 4) {
+				var beginnerScore = localStorage.getItem('beginnerScore');
+				if (!beginnerScore) beginnerScore = 999;
+				if (seconds < beginnerScore) {
+					localStorage.setItem('beginnerScore', seconds);
+				}
+			} else if (gLevel.size === 8) {
+				var mediumScore = localStorage.getItem('mediumScore');
+				if (!mediumScore) mediumScore = 999;
+				if (seconds < mediumScore) {
+					localStorage.setItem('mediumScore', seconds);
+				}
+			} else if (gLevel.size === 12) {
+				var expertScore = localStorage.getItem('expertScore');
+				if (!expertScore) expertScore = 999;
+				if (seconds < expertScore) {
+					localStorage.setItem('expertScore', seconds);
+				}
+			}
+
+			renderHighScores();
 		}
 	}
 }

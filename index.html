@@ -8,11 +8,10 @@
 		<title>Minesweeper</title>
 
 		<link rel="stylesheet" href="css/game.css" />
+		<link rel="stylesheet" href="css/table.css" />
 	</head>
 	<body onload="initGame()">
-		<div class="header">
-			<h1>Minesweeper</h1>
-		</div>
+		<div class="header">Minesweeper</div>
 
 		<div class="difficulty-buttons">
 			<button onclick="initGame(4, 2)">Beginner</button>
@@ -20,28 +19,47 @@
 			<button onclick="initGame(12, 30)">Expert</button>
 		</div>
 
-		<div class="game-container">
-			<table border="1">
-				<thead>
-					<tr>
-						<td class="board-header">
-							<div class="flex-header">
-								<div class="flags-count">002</div>
-								<button onclick="initGame()">🙂</button>
-								<div class="timer">000</div>
-							</div>
-						</td>
-					</tr>
-				</thead>
-				<tbody class="board"></tbody>
-			</table>
+		<div class="page-flexbox">
+			<div class="game-buttons">
+				<button>Safe Click</button>
+				<p>&nbsp safe clicks left: <span>3</span></p>
+				<button>Manual Mode</button>
+				<button>7 BOOM!</button>
+				<button id="hidden-button">hidden</button>
+				<button id="undo-button">UNDO &nbsp&nbsp&nbsp👈</button>
+			</div>
 
-			<footer>
-				<div>Project by: Anton Kandyba</div>
-			</footer>
+			<div class="game-container">
+				<table>
+					<thead>
+						<tr>
+							<td class="board-header">
+								<div class="flex-header">
+									<div class="flags-count">002</div>
+									<button onclick="initGame()">🙂</button>
+									<div class="timer">000</div>
+								</div>
+							</td>
+						</tr>
+					</thead>
+					<tbody class="board"></tbody>
+				</table>
+			</div>
 
-			<script src="js/game.js"></script>
-			<script src="js/util.js"></script>
+			<div class="high-scores">
+				<h2>High Scores:</h2>
+				<h3>Beginner: <span id="beginner-score"></span></h3>
+				<h3>Medium: <span id="medium-score"></span></h3>
+				<h3>Expert: <span id="expert-score"></span></h3>
+			</div>
 		</div>
+
+		<footer>
+			<div>Project by: Anton Kandyba</div>
+		</footer>
+
+		<script src="js/game.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/hints.js"></script>
 	</body>
 </html>
