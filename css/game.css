@@ -28,6 +28,10 @@ td {
 	background-color: #808080;
 }
 
+.blown {
+	background-color: brown;
+}
+
 button {
 	height: 50px;
 	width: 50px;

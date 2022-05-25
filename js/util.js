@@ -1,5 +1,9 @@
 'use strict';
 
+const STANDARD_SMILEY = '🙂';
+const WIN_SMILEY = '😎';
+const LOSE_SMILEY = '🤯';
+
 function renderBoard(board) {
 	var boardHTML = '';
 	var elHeader = document.querySelector('.board-header');
@@ -11,13 +15,18 @@ function renderBoard(board) {
 		for (var j = 0; j < board[i].length; j++) {
 			var cell = board[i][j];
 			var cellData = `data-i="${i}" data-j="${j}"`;
+
 			var cellClass = cell.isMine ? 'mine' : `number${cell.mineAroundCount}`;
 			cellClass += cell.isShown ? ' shown' : ' hidden';
+			if (cell.isMine && cell.isBlown) cellClass += ' blown';
 
-			// show empty cell if count is 0
-			var cellContent = cell.mineAroundCount ? cell.mineAroundCount : EMPTY;
-			// show a mine if the cell contains a mine
-			cellContent = cell.isMine ? MINE : cellContent;
+			// set cell content according to the cell
+			var cellContent = EMPTY;
+			if (cell.mineAroundCount > 0) cellContent = cell.mineAroundCount;
+			else if (cell.isMine) cellContent = MINE;
+
+			// show a flag if the cell is marked no matter the content
+			if (cell.isMarked) cellContent = FLAG;
 
 			boardHTML += `<td ${cellData} class="${cellClass}" 
                             onclick="cellClicked(this)"
@@ -33,6 +42,11 @@ function renderBoard(board) {
 	elBoard.innerHTML = boardHTML;
 
 	preventTdContextMenu();
+}
+
+function renderSmiley(smiley) {
+	var elBtn = document.querySelector('.board-header button');
+	elBtn.innerText = smiley;
 }
 
 // builds an empty square board
@@ -103,4 +117,23 @@ function preventTdContextMenu() {
 //The maximum is exclusive and the minimum is inclusive
 function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min) + min);
+}
+
+// print values of table for debugging
+function printTable(board) {
+	var mat = [];
+
+	for (var i = 0; i < board.length; i++) {
+		mat.push([]);
+		for (var j = 0; j < board[i].length; j++) {
+			var cell = board[i][j];
+
+			if (cell.isMarked) mat[i][j] = FLAG;
+			else if (cell.isMine) mat[i][j] = MINE;
+			else if (cell.mineAroundCount > 0) mat[i][j] = cell.mineAroundCount;
+			else mat[i][j] = EMPTY;
+		}
+	}
+
+	console.table(mat);
 }
