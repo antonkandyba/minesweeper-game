@@ -15,31 +15,45 @@ var gGame = {
 	isOn: false,
 	shownCount: 0,
 	markedCount: 0,
-	timer: 0,
+	flagsCount: 0,
+	interval: 0,
+	startTime: 0,
+	livesCount: 3,
+	hintsCount: 3,
 };
 
 function initGame(size = gLevel.size, mineCount = gLevel.mines) {
+	clearInterval(gGame.interval);
+	gGame.interval = 0;
+	gGame.startTime = new Date();
+	renderTimer();
+
+	gGame.livesCount = 3;
+	// renderLives();
+
+	gGame.hintsCount = 3;
+	// renderHints();
+
 	gBoard = buildEmptyBoard(size);
 
 	gLevel.size = size;
 	gLevel.mines = mineCount;
 
+	gGame.flagsCount = 0;
+	renderFlagsCount();
+
 	gGame.shownCount = 0;
 	gGame.markedCount = 0;
 
-	buildBoard(gBoard);
+	// buildBoard(gBoard);
 	renderBoard(gBoard);
 	renderSmiley(STANDARD_SMILEY);
-
-	printTable(gBoard);
-
-	gGame.isOn = true;
 }
 
-// builds cells for an empty board
-function buildBoard(board) {
+// builds cells for an empty board, pos is the position of the first click
+function buildBoard(board, pos) {
 	// first put the mines on the board
-	var minesPos = getRandomMinePositions(board, gLevel.mines);
+	var minesPos = getRandomMinePositions(board, gLevel.mines, pos);
 
 	for (var i = 0; i < minesPos.length; i++) {
 		board[minesPos[i].i][minesPos[i].j] = {
@@ -70,6 +84,8 @@ function buildBoard(board) {
 
 // called when cell is left-clicked
 function cellClicked(elCell) {
+	// check if this is the first click of the game
+	if (!gGame.interval) firstClick(elCell);
 	// do nothing if game is not on
 	if (!gGame.isOn) return;
 
@@ -84,8 +100,12 @@ function cellClicked(elCell) {
 	cell.isChecked = true;
 
 	if (cell.isMine) {
+		// stop game
 		cell.isBlown = true;
 		gGame.isOn = false;
+		clearInterval(gGame.interval);
+
+		revealAllMines(gBoard);
 
 		// change the smiley
 		renderSmiley(LOSE_SMILEY);
@@ -105,6 +125,17 @@ function cellClicked(elCell) {
 	renderBoard(gBoard);
 }
 
+function firstClick(elCell) {
+	gGame.isOn = true;
+	gGame.startTime = new Date();
+
+	gGame.interval = setInterval(renderTimer, 1000);
+
+	var pos = { i: elCell.dataset.i, j: elCell.dataset.j };
+	buildBoard(gBoard, pos);
+	renderBoard(gBoard);
+}
+
 // called when cell is right-clicked
 function cellMarked(elCell) {
 	// do nothing if game is not on
@@ -121,6 +152,10 @@ function cellMarked(elCell) {
 	// if cell was a mine, add 1 to marked count
 	// if correct flag is removed decrease the count
 	if (cell.isMine) cell.isMarked ? gGame.markedCount++ : gGame.markedCount--;
+
+	cell.isMarked ? gGame.flagsCount++ : gGame.flagsCount--;
+
+	renderFlagsCount();
 
 	// check for win condition
 	checkGameOver();
@@ -173,7 +208,7 @@ function checkGameOver() {
 		if (gGame.shownCount === nonMineCells) {
 			// stop the game
 			gGame.isOn = false;
-
+			clearInterval(gGame.interval);
 			renderSmiley(WIN_SMILEY);
 		}
 	}

@@ -2,14 +2,19 @@ h1 {
 	text-align: center;
 }
 
+.difficulty-buttons {
+	margin-bottom: 20px;
+	text-align: center;
+}
+
 table {
 	border: 1px solid #c6c6c6;
 	margin: auto;
 }
 
 td {
-	height: 36px;
-	width: 36px;
+	height: 45px;
+	width: 45px;
 
 	text-align: center;
 	font-weight: 1000;
@@ -32,7 +37,19 @@ td {
 	background-color: brown;
 }
 
-button {
+.flex-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.flex-header div {
+	padding: 10px;
+	margin: 5px;
+	background-color: #808080;
+}
+
+.board-header button {
 	height: 50px;
 	width: 50px;
 	margin: 5px;
@@ -41,6 +58,16 @@ button {
 
 	border: 2px solid #808080;
 	background-color: #c6c6c6;
+}
+
+footer {
+	position: absolute;
+	bottom: 0;
+
+	padding: 10px;
+	height: 30px;
+
+	text-align: right;
 }
 
 .number1 {

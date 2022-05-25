@@ -3,6 +3,8 @@
 const STANDARD_SMILEY = '🙂';
 const WIN_SMILEY = '😎';
 const LOSE_SMILEY = '🤯';
+const LIFE = '💗';
+const HINT = '💡';
 
 function renderBoard(board) {
 	var boardHTML = '';
@@ -18,7 +20,7 @@ function renderBoard(board) {
 
 			var cellClass = cell.isMine ? 'mine' : `number${cell.mineAroundCount}`;
 			cellClass += cell.isShown ? ' shown' : ' hidden';
-			if (cell.isMine && cell.isBlown) cellClass += ' blown';
+			if (cell.isBlown) cellClass += ' blown';
 
 			// set cell content according to the cell
 			var cellContent = EMPTY;
@@ -38,15 +40,57 @@ function renderBoard(board) {
 		boardHTML += '</tr>';
 	}
 
+	boardHTML += getBoardFooter();
+
 	var elBoard = document.querySelector('.board');
 	elBoard.innerHTML = boardHTML;
 
 	preventTdContextMenu();
 }
 
+function getBoardFooter() {
+	return `<tr>
+                <td colspan="${gBoard[0].length}">
+                    <div class ="footer-flex">
+                        <div class="lives-count"></div>
+                        <div class="hints-count"></div>
+                    </div>
+                </td>
+            </tr>`;
+}
+
 function renderSmiley(smiley) {
 	var elBtn = document.querySelector('.board-header button');
 	elBtn.innerText = smiley;
+}
+
+function renderTimer() {
+	var timeNow = new Date();
+
+	var seconds = Math.floor((timeNow - gGame.startTime) / 1000);
+
+	// make the timer alway 3 chars long
+	if (seconds < 10) seconds = '00' + seconds;
+	else if (seconds < 100) seconds = '0' + seconds;
+	else if (seconds > 999) seconds = '999';
+
+	var elTimer = document.querySelector('.timer');
+	elTimer.innerText = seconds;
+}
+
+function renderFlagsCount() {
+	// count how many flags we still need to place
+	var displayFlags = gLevel.mines - gGame.flagsCount;
+
+	// make the counter alway 3 chars long
+	if (displayFlags <= -10) displayFlags = displayFlags;
+	else if (displayFlags < 0) displayFlags = '-0' + -displayFlags;
+	else if (displayFlags === 0) displayFlags = '000';
+	else if (displayFlags < 10) displayFlags = '00' + displayFlags;
+	else if (displayFlags < 100) displayFlags = '0' + displayFlags;
+
+	var elFlags = document.querySelector('.flags-count');
+	elFlags.innerText = displayFlags;
 }
 
 // builds an empty square board
@@ -63,13 +107,16 @@ function buildEmptyBoard(size) {
 }
 
 // gets random position on the board
-function getRandomMinePositions(board, mineCount) {
+function getRandomMinePositions(board, mineCount, pos) {
 	var cells = [];
 
 	// get objects for all possible cells
 	for (var i = 0; i < board.length; i++) {
 		for (var j = 0; j < board[i].length; j++) {
-			cells[i * board.length + j] = { i, j };
+			// exclude first click from possible mine positions
+			if (!(i === +pos.i && j === +pos.j)) {
+				cells.push({ i, j });
+			}
 		}
 	}
 
@@ -136,4 +183,16 @@ function printTable(board) {
 	}
 
 	console.table(mat);
+}
+
+// show all mines (when you lose)
+function revealAllMines(gBoard) {
+	for (var i = 0; i < gBoard.length; i++) {
+		for (var j = 0; j < gBoard[i].length; j++) {
+			var cell = gBoard[i][j];
+			if (cell.isMine) cell.isShown = true;
+			// show wrong flags
+			if (cell.isMarked && !cell.isMine) cell.isBlown = true;
+		}
+	}
 }

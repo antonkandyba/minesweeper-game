@@ -14,17 +14,31 @@
 			<h1>Minesweeper</h1>
 		</div>
 
+		<div class="difficulty-buttons">
+			<button onclick="initGame(4, 2)">Beginner</button>
+			<button onclick="initGame(8, 12)">Medium</button>
+			<button onclick="initGame(12, 30)">Expert</button>
+		</div>
+
 		<div class="game-container">
 			<table border="1">
 				<thead>
 					<tr>
 						<td class="board-header">
-							<button onclick="initGame()">🙂</button>
+							<div class="flex-header">
+								<div class="flags-count">002</div>
+								<button onclick="initGame()">🙂</button>
+								<div class="timer">000</div>
+							</div>
 						</td>
 					</tr>
 				</thead>
 				<tbody class="board"></tbody>
 			</table>
+
+			<footer>
+				<div>Project by: Anton Kandyba</div>
+			</footer>
 
 			<script src="js/game.js"></script>
 			<script src="js/util.js"></script>
