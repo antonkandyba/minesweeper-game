@@ -23,6 +23,7 @@ body {
 .game-buttons {
 	display: flex;
 	flex-direction: column;
+	gap: 5px;
 }
 
 .game-buttons button {
@@ -43,6 +44,9 @@ body {
 .game-buttons button:hover {
 	background-color: hsla(0, 0%, 20%, 0.7);
 }
+.game-buttons p {
+	margin: 7px;
+}
 
 #undo-button {
 	background-color: slateblue;
@@ -50,7 +54,7 @@ body {
 
 #hidden-button {
 	visibility: hidden;
-	height: 80px;
+	height: 50px;
 }
 .difficulty-buttons {
 	margin-bottom: 20px;

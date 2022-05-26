@@ -7,6 +7,8 @@
 
 		<title>Minesweeper</title>
 
+		<link rel="shortcut icon" href="img/naval-mine-2.png" type="image/x-icon" />
+
 		<link rel="stylesheet" href="css/game.css" />
 		<link rel="stylesheet" href="css/table.css" />
 	</head>
@@ -21,10 +23,10 @@
 
 		<div class="page-flexbox">
 			<div class="game-buttons">
-				<button>Safe Click</button>
-				<p>&nbsp safe clicks left: <span>3</span></p>
-				<button>Manual Mode</button>
-				<button>7 BOOM!</button>
+				<button onclick="safeClick()">Safe Click</button>
+				<p id="safe-click"></p>
+				<button id="manual-mode-button" onclick="clickManualModeButton()">Manual Mode</button>
+				<button id="boom-button">7 BOOM!</button>
 				<button id="hidden-button">hidden</button>
 				<button id="undo-button">UNDO &nbsp&nbsp&nbsp👈</button>
 			</div>
@@ -61,5 +63,6 @@
 		<script src="js/game.js"></script>
 		<script src="js/util.js"></script>
 		<script src="js/hints.js"></script>
+		<script src="js/extra-functionality.js"></script>
 	</body>
 </html>

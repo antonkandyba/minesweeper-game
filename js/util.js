@@ -21,6 +21,7 @@ function renderBoard(board) {
 			var cellClass = cell.isMine ? 'mine' : `number${cell.mineAroundCount}`;
 			cellClass += cell.isShown ? ' shown' : ' hidden';
 			if (cell.isBlown) cellClass += ' blown';
+			if (cell.isHinted) cellClass += ' hinted';
 
 			// set cell content according to the cell
 			var cellContent = EMPTY;

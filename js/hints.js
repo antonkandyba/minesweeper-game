@@ -1,9 +1,14 @@
 'use strict';
 
+const SAFE_CLICK = '🎯';
+
 var gHints = {
 	isHintsClicked: false,
 	hintTimeout: 0,
 	hintOrigCells: [],
+	safeClickCount: 3,
+	safeClickTimeout: 0,
+	safeCell: null,
 };
 
 function clickHint(elHints) {
@@ -62,4 +67,61 @@ function hideNeighbours() {
 	gHints.isHintsClicked = false;
 
 	renderBoard(gBoard);
+}
+
+function safeClick() {
+	// do nothing if game is not on
+	if (!gGame.isOn) return;
+	// do nothing if we have no safe clicks left
+	if (gHints.safeClickCount === 0) return;
+	// dont show multiple hints at once
+	if (gHints.safeClickTimeout) return;
+
+	gHints.safeClickCount--;
+
+	gHints.safeCell = getRandomSafeCell();
+	if (!gHints.safeCell) return;
+
+	gHints.safeCell.isHinted = true;
+
+	renderBoard(gBoard);
+	renderSafeClick();
+
+	gHints.safeClickTimeout = setTimeout(clearSafeClick, 1500);
+}
+
+function getRandomSafeCell() {
+	var safeCells = [];
+
+	for (var i = 0; i < gBoard.length; i++) {
+		for (var j = 0; j < gBoard[0].length; j++) {
+			var cell = gBoard[i][j];
+			// if cell is hidden and not a mine
+			if (!cell.isShown && !cell.isMine) {
+				safeCells.push(cell);
+			}
+		}
+	}
+	// if ther are no safe clicks on the board
+	if (safeCells.length === 0) return null;
+
+	var randIdx = getRandomInt(0, safeCells.length);
+	return safeCells.splice(randIdx, 1)[0];
+}
+
+function clearSafeClick() {
+	gHints.safeCell.isHinted = false;
+	gHints.safeClickTimeout = 0;
+	renderBoard(gBoard);
+}
+
+function renderSafeClick() {
+	var elSafe = document.querySelector('#safe-click');
+
+	// if no hints left, insert a hidden div to keep the spacing
+	if (gHints.safeClickCount > 0) {
+		elSafe.innerText = SAFE_CLICK.repeat(gHints.safeClickCount);
+	} else {
+		elSafe.innerHTML = '<div style="visibility:hidden; height:21px;"></div>';
+	}
 }

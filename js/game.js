@@ -2,7 +2,8 @@
 
 // constants
 var EMPTY = '';
-var MINE = '💣';
+// var MINE = '💣';
+var MINE = '<img src="img/naval-mine.png" />';
 var FLAG = '🚩';
 
 // global variables
@@ -24,6 +25,7 @@ var gGame = {
 
 function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 	clearInterval(gGame.interval);
+	gGame.isOn = false;
 	gGame.interval = 0;
 	gGame.startTime = new Date();
 	renderTimer();
@@ -38,6 +40,8 @@ function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 
 	gLevel.size = size;
 	gLevel.mines = mineCount;
+	if (gManualMode.prevBombCount) gLevel.mines = gManualMode.prevBombCount;
+	gManualMode.prevBombCount = 0;
 
 	gGame.flagsCount = 0;
 	renderFlagsCount();
@@ -48,47 +52,71 @@ function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 	gHints.hintTimeout = 0;
 	gHints.hintOrigCells = [];
 	gHints.isHintsClicked = false;
+	gHints.safeClickCount = 3;
+	clearTimeout(gHints.safeClickTimeout);
+	gHints.safeClickTimeout = 0;
+	gHints.safeCell = null;
+
+	gManualMode.isOn = false;
+	gManualMode.mines = [];
+
+	// return manual mode and 7 boom button when new game is started
+	var elManualBtn = document.querySelector('#manual-mode-button');
+	elManualBtn.style.visibility = 'visible';
+	elManualBtn.innerText = 'Manual Mode';
+	var elBoomBtn = document.querySelector('#boom-button');
+	elBoomBtn.style.visibility = 'visible';
 
 	// buildBoard(gBoard);
 	renderBoard(gBoard);
 	renderSmiley(STANDARD_SMILEY);
 	renderHighScores();
+	renderSafeClick();
 }
 
 // builds cells for an empty board, pos is the position of the first click
-function buildBoard(board, pos) {
-	// first put the mines on the board
-	var minesPos = getRandomMinePositions(board, gLevel.mines, pos);
-
+function buildBoard(board, pos, minesPos = getRandomMinePositions(board, gLevel.mines, pos)) {
+	// first put the mines on the board, default to random mine positions
 	for (var i = 0; i < minesPos.length; i++) {
-		board[minesPos[i].i][minesPos[i].j] = {
-			mineAroundCount: -1,
-			isShown: false,
-			isMine: true,
-			isMarked: false,
-			isChecked: true,
-			isBlown: false,
-		};
+		var mine = createStandardCell();
+		mine.mineAroundCount = -1;
+		mine.isMine = true;
+		mine.isChecked = true;
+
+		board[minesPos[i].i][minesPos[i].j] = mine;
 	}
 
 	// now put all numbers where there are no mines
 	for (var i = 0; i < board.length; i++) {
 		for (var j = 0; j < board[i].length; j++) {
-			if (board[i][j] === EMPTY) {
-				board[i][j] = {
-					mineAroundCount: countNegMines(board, i, j),
-					isShown: false,
-					isMine: false,
-					isMarked: false,
-					isChecked: false,
-				};
+			if (!board[i][j].isMine) {
+				var cell = createStandardCell();
+				cell.mineAroundCount = countNegMines(board, i, j);
+
+				board[i][j] = cell;
 			}
 		}
 	}
 }
 
+function createStandardCell() {
+	return {
+		isShown: false,
+		isMine: false,
+		isMarked: false,
+		isChecked: false,
+		isBlown: false,
+		isHinted: false,
+	};
+}
+
 // called when cell is left-clicked
 function cellClicked(elCell) {
+	// if manual mode is on, we only need to add bombs
+	if (gManualMode.isOn) {
+		manualCellClicked(elCell);
+		return;
+	}
 	// check if this is the first click of the game
 	if (!gGame.interval) firstClick(elCell);
 	// do nothing if game is not on
@@ -101,6 +129,13 @@ function cellClicked(elCell) {
 	if (cell.isShown) return;
 	// do nothing if flag is clicked
 	if (cell.isMarked) return;
+
+	// disable the glow if the safe cell is clicked
+	if (gHints.safeClickTimeout && cell === gHints.safeCell) {
+		clearTimeout(gHints.safeClickTimeout);
+		gHints.safeClickTimeout = 0;
+		clearSafeClick();
+	}
 
 	// if player clicked the hint before clicking on the board
 	if (gHints.isHintsClicked) {
@@ -156,10 +191,21 @@ function firstClick(elCell) {
 	gGame.isOn = true;
 	gGame.startTime = new Date();
 
+	// starts the timer
 	gGame.interval = setInterval(renderTimer, 1000);
 
+	// hidemanual mode and 7 boom buttons when normal game has starterd
+	var elManualBtn = document.querySelector('#manual-mode-button');
+	elManualBtn.style.visibility = 'hidden';
+	var elBoomBtn = document.querySelector('#boom-button');
+	elBoomBtn.style.visibility = 'hidden';
+
+	// make sure first click is never a bomb
 	var pos = { i: elCell.dataset.i, j: elCell.dataset.j };
-	buildBoard(gBoard, pos);
+
+	// build board by manual mines if the played did used manual mode
+	if (gManualMode.mines.length) buildBoard(gBoard, pos, gManualMode.mines);
+	else buildBoard(gBoard, pos);
 	renderBoard(gBoard);
 }
 
