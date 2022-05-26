@@ -40,8 +40,11 @@ function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 
 	gLevel.size = size;
 	gLevel.mines = mineCount;
+	// set mine count to previous number if we have played 7 boom or manual mode before
 	if (gManualMode.prevBombCount) gLevel.mines = gManualMode.prevBombCount;
 	gManualMode.prevBombCount = 0;
+	if (gBoom.prevBombCount) gLevel.mines = gBoom.prevBombCount;
+	gBoom.prevBombCount = 0;
 
 	gGame.flagsCount = 0;
 	renderFlagsCount();
@@ -59,6 +62,11 @@ function initGame(size = gLevel.size, mineCount = gLevel.mines) {
 
 	gManualMode.isOn = false;
 	gManualMode.mines = [];
+
+	gBoom.mines = [];
+
+	gStates.board = [];
+	gStates.game = [];
 
 	// return manual mode and 7 boom button when new game is started
 	var elManualBtn = document.querySelector('#manual-mode-button');
@@ -145,6 +153,9 @@ function cellClicked(elCell) {
 		return;
 	}
 
+	// save the game state before any changes
+	saveState();
+
 	// if hidden cell is clicked, show it
 	cell.isShown = true;
 	cell.isChecked = true;
@@ -220,6 +231,9 @@ function cellMarked(elCell) {
 	// do nothing if cell is already shown and it is not a flag
 	if (cell.isShown && !cell.isMarked) return;
 
+	// save the game state before any changes
+	saveState();
+
 	// toggle the flag
 	cell.isMarked = !cell.isMarked;
 	cell.isShown = !cell.isShown;
@@ -290,19 +304,19 @@ function checkGameOver() {
 			var timeNow = new Date();
 			var seconds = Math.floor((timeNow - gGame.startTime) / 1000);
 
-			if (gLevel.size === 4) {
+			if (gLevel.size === 4 && gLevel.mines === 2) {
 				var beginnerScore = localStorage.getItem('beginnerScore');
 				if (!beginnerScore) beginnerScore = 999;
 				if (seconds < beginnerScore) {
 					localStorage.setItem('beginnerScore', seconds);
 				}
-			} else if (gLevel.size === 8) {
+			} else if (gLevel.size === 8 && gLevel.mines === 12) {
 				var mediumScore = localStorage.getItem('mediumScore');
 				if (!mediumScore) mediumScore = 999;
 				if (seconds < mediumScore) {
 					localStorage.setItem('mediumScore', seconds);
 				}
-			} else if (gLevel.size === 12) {
+			} else if (gLevel.size === 12 && gLevel.mines === 30) {
 				var expertScore = localStorage.getItem('expertScore');
 				if (!expertScore) expertScore = 999;
 				if (seconds < expertScore) {
